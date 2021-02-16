@@ -16,8 +16,8 @@ The agent can be configured by adding the following files in the binding's direc
 
 | File Type        | Behaviour           |
 | ------------- |:-------------:| 
-| `.yaml`      |  Contributes the file into the image and assigns the env variable `DD_JMXFETCH_CONFIG` to the file's path in the image. | 
-| `.properties`      | Contributes the file into the image and assigns the env variable `DD_TRACE_CONFIG` to the file's path in the image.      | 
+| `.yaml`      |  Contributes the file into the image and assigns `DD_JMXFETCH_CONFIG` to the file's path in the image. | 
+| `.properties`      | Contributes the file into the image and assigns `DD_TRACE_CONFIG` to the file's path in the image.      | 
 
 Currently only one of each configuration file can be provided in the binding.
 
