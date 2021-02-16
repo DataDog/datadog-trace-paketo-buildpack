@@ -1,5 +1,5 @@
 <!-- # `gcr.io/paketo-buildpacks/azure-application-insights` -->
-# Datadog Trace Agent Paketo Buildpack
+# datadog trace agent paketo buildpack
 The Paketo Datadog Trace Buildpack is a Cloud Native Buildpack that contributes the Data trace agent and configures it to connect to the service running on an OCI image.
 
 ## Behaviour
