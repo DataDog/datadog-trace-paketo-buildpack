@@ -1,0 +1,4 @@
+./jam-darwin pack \
+  --buildpack ./buildpack.toml \
+  --version 1.0.0 \
+  --output ./datadog-trace.tgz
