@@ -9,7 +9,7 @@ This buildpack will participate if all the following conditions are met:
 
 The buildpack will do the following for Java applications:
 
-* Contributes a Java agent to a layer and configures `JAVA_TOOL_OPTIONS` to use it
+* Contributes the **latest** datadog Java agent to a layer and configures `JAVA_TOOL_OPTIONS` to use it
 
 ## Configuring the Agent
 The agent can be configured by adding the following files in the binding's directory:
