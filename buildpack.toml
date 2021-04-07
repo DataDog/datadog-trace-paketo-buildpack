@@ -29,9 +29,8 @@ id = "org.cloudfoundry.stacks.cflinuxfs3"
 [[metadata.dependencies]]
 id      = "datadog-trace-java"
 name    = "Datadog Trace Java Agent"
-version = "0.70.0"
-uri     = "https://repo1.maven.org/maven2/com/datadoghq/dd-java-agent/0.70.0/dd-java-agent-0.70.0.jar"
-sha256  = "799868a8196959d51f83ea7c5954c7ed6b29069b06286fae203b4d2e5d7ad53a"
+version = "0.0"
+uri     = "https://dtdg.co/latest-java-tracer"
 stacks  = [ "io.buildpacks.stacks.bionic", "org.cloudfoundry.stacks.cflinuxfs3" ]
 
   [[metadata.dependencies.licenses]]
