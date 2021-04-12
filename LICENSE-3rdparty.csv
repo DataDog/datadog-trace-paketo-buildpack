@@ -1,0 +1,5 @@
+Component,Origin,License,Copyright,
+import,github.com/onsi/gomega,MIT,Copyright (c) 2013-2014 Onsi Fakhouri,
+import,github.com/buildpacks/libcnb,Apache-2.0,Copyright (c) 2020-Present CloudFoundry.org Foundation Inc.,
+import,github.com/sclevine/spec,Apache-2.0,,
+import,github.com/paketo-buildpacks/libpak,Apache-2.0,Copyright (c) 2020-Present CloudFoundry.org Foundation Inc.,
