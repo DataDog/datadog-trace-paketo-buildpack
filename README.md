@@ -1,6 +1,6 @@
 <!-- # `gcr.io/paketo-buildpacks/azure-application-insights` -->
-# datadog trace agent paketo buildpack
-The Paketo Datadog Trace Buildpack is a Cloud Native Buildpack that contributes the Data trace agent and configures it to connect to the service running on an OCI image.
+# Datadog Trace Agent Paketo Buildpack
+The Paketo Datadog Trace Buildpack is a Cloud Native Buildpack that contributes the Datadog Trace Agent and configures it to connect to the service running on an OCI image. Currently, this buildpack only supports Java applications.
 
 ## Behaviour
 This buildpack will participate if all the following conditions are met:
@@ -9,7 +9,7 @@ This buildpack will participate if all the following conditions are met:
 
 The buildpack will do the following for Java applications:
 
-* Contributes the **latest** datadog Java agent to a layer and configures `JAVA_TOOL_OPTIONS` to use it
+* Contributes the **latest** Datadog Java agent to a layer and configures `JAVA_TOOL_OPTIONS` to use it
 
 ## Configuring the Agent
 The agent can be configured by adding the following files in the binding's directory:
