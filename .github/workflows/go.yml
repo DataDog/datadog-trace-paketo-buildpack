@@ -13,8 +13,53 @@ jobs:
       with:
         go-version: 1.15
 
+    - name: Install jam 
+      run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        echo "Installing Jam ${JAM_VERSION}"
+        
+        mkdir -p "${HOME}"/bin
+
+        echo "${HOME}/bin" >> "${GITHUB_PATH}"
+        curl \
+          --location \
+          --show-error \
+          --silent \
+          "https://github.com/paketo-buildpacks/packit/releases/download/v${JAM_VERSION}/jam-linux"
+          
+          chmod a+x ./jam-linux
+          cp ./jam-linux ${HOME}/bin/jam
+      env:
+        JAM_VERSION: 0.10.2
+
+
+    - name: Install pack
+      run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        echo "Installing pack ${PACK_VERSION}"
+
+        mkdir -p "${HOME}"/bin
+
+        echo "${HOME}/bin" >> "${GITHUB_PATH}"
+
+        curl \
+          --location \
+          --show-error \
+          --silent \
+          "https://github.com/buildpacks/pack/releases/download/v${PACK_VERSION}/pack-v${PACK_VERSION}-linux.tgz" \
+        | tar -C "${HOME}"/bin -xz pack
+      env:
+        PACK_VERSION: 0.15.0
+
     - name: Check Format
       run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
         if [[ $(gofmt -l .) ]]; then
           echo " The following files are not formatted properly (run `go fmt` to resolve this issue):"
           echo "$(gofmt -l .)"
@@ -25,3 +70,10 @@ jobs:
       
     - name: Run Tests
       run:  go test ./...
+
+    # - name: Check buildpack can be packaged properly
+    #   run: |
+    #     #!/usr/bin/env bash
+    #     set -euo pipefail
+
+        
