@@ -1,8 +1,7 @@
 name: Publish Docker image
-# on:
-#   release:
-#     types: [published]
-on: [push]
+on:
+  release:
+    types: [published]
 jobs: 
   publish_buildpack:
     name: Push buildpack to GitHub Packages
@@ -65,15 +64,13 @@ jobs:
         set -euo pipefail
 
         echo "Verifying Release Tag"
-        # if [[ $(git describe --tags --abbrev=0) =~ ^[0-9]*(.[0-9])*$ ]]; then
-        #   RELEASE_VERSION=$(git describe --tags --abbrev=0)
-        # else
-        #   echo "tag does not exist or formatting is invalid"
-        #   exit 1
-        # fi
-        RELEASE_VERSION=1.0.0
-        
-        
+        if [[ $(git describe --tags --abbrev=0) =~ ^[0-9]*(.[0-9])*$ ]]; then
+          RELEASE_VERSION=$(git describe --tags --abbrev=0)
+        else
+          echo "Tag is nonexistent or formatting is invalid"
+          exit 1
+        fi
+
         echo "::set-output name=version::${RELEASE_VERSION}"
         echo "Selected version ${RELEASE_VERSION} from
           * ref: ${GITHUB_REF}
