@@ -86,7 +86,7 @@ jobs:
         uri = '${HOME}/build/${PACKAGE_NAME}'
         [platform]
         os = 'linux'" > ${HOME}/build/package.toml
-        pack package-buildpack "datadog/datadog-trace:${VERSION}" --config ${HOME}/build/package.toml --format image
+        pack package-buildpack "datadog-trace:${VERSION}" --config ${HOME}/build/package.toml --format image
       env:
         VERSION: 0.1.1
         PACKAGE_NAME: datadog-trace.tgz
@@ -100,7 +100,6 @@ jobs:
         echo ${GITHUB_TOKEN} | docker login https://docker.pkg.github.com -u ${{ github.actor }} --password-stdin
         
         echo "Publishing to Github Packages"
-        echo "${{ github }}"
         echo "Repo name is ${REPO_NAME}"
 
         docker tag "${BUILDPACK_NAME}:${BUILDPACK_VERSION}" docker.pkg.github.com/datadog/${REPO_NAME}/${BUILDPACK_NAME}:${BUILDPACK_VERSION}
