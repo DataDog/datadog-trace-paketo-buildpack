@@ -1,0 +1,91 @@
+name: Correctness, Build, and Formatting Tests
+
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+
+    - name: Install jam 
+      run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        echo "Installing Jam ${JAM_VERSION}"
+        
+        mkdir -p "${HOME}"/bin
+
+        echo "${HOME}/bin" >> "${GITHUB_PATH}"
+        curl \
+          --location \
+          --show-error \
+          --silent \
+          "https://github.com/paketo-buildpacks/packit/releases/download/v${JAM_VERSION}/jam-linux" \
+          --output ${HOME}/bin/jam
+
+        chmod a+x "${HOME}"/bin/jam
+      env:
+        JAM_VERSION: 0.10.2
+
+
+    - name: Install pack
+      run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        echo "Installing pack ${PACK_VERSION}"
+
+        mkdir -p "${HOME}"/bin
+
+        echo "${HOME}/bin" >> "${GITHUB_PATH}"
+
+        curl \
+          --location \
+          --show-error \
+          --silent \
+          "https://github.com/buildpacks/pack/releases/download/v${PACK_VERSION}/pack-v${PACK_VERSION}-linux.tgz" \
+        | tar -C "${HOME}"/bin -xz pack
+      env:
+        PACK_VERSION: 0.15.0
+
+    - name: Check Format
+      run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        if [[ $(gofmt -l .) ]]; then
+          echo " The following files are not formatted properly (run `go fmt` to resolve this issue):"
+          echo "$(gofmt -l .)"
+          exit 1
+        else
+          exit 0
+        fi
+      
+    - name: Run Unit Tests
+      run:  go test ./...
+
+    - name: Check Buildpack Packages Successfully
+      run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        mkdir ${HOME}/build
+
+        echo "Package repo using jam"
+        jam pack --buildpack "${GITHUB_WORKSPACE}/buildpack.toml" --version ${VERSION} --output "${HOME}/build/${PACKAGE_NAME}"
+
+        echo "Building docker image using packaged tgz"
+        echo "[buildpack]
+        uri = '${HOME}/build/${PACKAGE_NAME}'
+        [platform]
+        os = 'linux'" > ${HOME}/build/package.toml
+        pack package-buildpack "datadog-trace:${VERSION}" --config ${HOME}/build/package.toml --format image
+      env:
+        VERSION: 0.0.0
+        PACKAGE_NAME: datadog-trace.tgz
