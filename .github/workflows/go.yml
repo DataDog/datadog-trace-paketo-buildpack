@@ -27,10 +27,10 @@ jobs:
           --location \
           --show-error \
           --silent \
-          "https://github.com/paketo-buildpacks/packit/releases/download/v${JAM_VERSION}/jam-linux"
-          
-          chmod a+x ./jam-linux
-          cp ./jam-linux ${HOME}/bin/jam
+          "https://github.com/paketo-buildpacks/packit/releases/download/v${JAM_VERSION}/jam-linux" \
+          --output ${HOME}/bin/jam
+
+        chmod a+x "${HOME}"/bin/jam
       env:
         JAM_VERSION: 0.10.2
 
