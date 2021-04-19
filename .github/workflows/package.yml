@@ -1,7 +1,8 @@
 name: Publish Docker image
 on:
   release:
-    - published
+      types:
+          - published
 jobs: 
   publish_buildpack:
     name: Push buildpack to GitHub Packages
