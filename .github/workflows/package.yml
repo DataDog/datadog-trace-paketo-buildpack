@@ -8,111 +8,110 @@ on:
       publish_buildpack:
         name: Push buildpack to GitHub Packages
         runs-on: ubuntu-latest
-       - uses: actions/checkout@v2
+        - uses: actions/checkout@v2
 
-    - name: Install Go
-      uses: actions/setup-go@v2
-      with:
-        go-version: 1.15
+        - name: Install Go
+          uses: actions/setup-go@v2
+          with:
+            go-version: 1.15
 
-    - name: Install Jam 
-      run: |
-        #!/usr/bin/env bash
-        set -euo pipefail
+        - name: Install Jam 
+          run: |
+            #!/usr/bin/env bash
+            set -euo pipefail
 
-        echo "Installing Jam ${JAM_VERSION}"
-        
-        mkdir -p "${HOME}"/bin
+            echo "Installing Jam ${JAM_VERSION}"
+            
+            mkdir -p "${HOME}"/bin
 
-        echo "${HOME}/bin" >> "${GITHUB_PATH}"
-        curl \
-          --location \
-          --show-error \
-          --silent \
-          "https://github.com/paketo-buildpacks/packit/releases/download/v${JAM_VERSION}/jam-linux" \
-          --output ${HOME}/bin/jam
+            echo "${HOME}/bin" >> "${GITHUB_PATH}"
+            curl \
+              --location \
+              --show-error \
+              --silent \
+              "https://github.com/paketo-buildpacks/packit/releases/download/v${JAM_VERSION}/jam-linux" \
+              --output ${HOME}/bin/jam
 
-        chmod a+x "${HOME}"/bin/jam
-      env:
-        JAM_VERSION: 0.10.2
+            chmod a+x "${HOME}"/bin/jam
+          env:
+            JAM_VERSION: 0.10.2
 
-    - name: Install pack
-      run: |
-        #!/usr/bin/env bash
-        set -euo pipefail
+        - name: Install pack
+          run: |
+            #!/usr/bin/env bash
+            set -euo pipefail
 
-        echo "Installing pack ${PACK_VERSION}"
+            echo "Installing pack ${PACK_VERSION}"
 
-        mkdir -p "${HOME}"/bin
+            mkdir -p "${HOME}"/bin
 
-        echo "${HOME}/bin" >> "${GITHUB_PATH}"
+            echo "${HOME}/bin" >> "${GITHUB_PATH}"
 
-        curl \
-          --location \
-          --show-error \
-          --silent \
-          "https://github.com/buildpacks/pack/releases/download/v${PACK_VERSION}/pack-v${PACK_VERSION}-linux.tgz" \
-        | tar -C "${HOME}"/bin -xz pack
-      env:
-        PACK_VERSION: 0.15.0
+            curl \
+              --location \
+              --show-error \
+              --silent \
+              "https://github.com/buildpacks/pack/releases/download/v${PACK_VERSION}/pack-v${PACK_VERSION}-linux.tgz" \
+            | tar -C "${HOME}"/bin -xz pack
+          env:
+            PACK_VERSION: 0.15.0
 
-    - name: Resolve Version Number
-      id: version
-      run: |
-        #!/usr/bin/env bash
-        set -euo pipefail
+        - name: Resolve Version Number
+          id: version
+          run: |
+            #!/usr/bin/env bash
+            set -euo pipefail
 
-        echo "Verifying Release Tag"
-        if [[ $(git describe --tags --abbrev=0) =~ ^[0-9]*(.[0-9])*$ ]]; then
-          RELEASE_VERSION=$(git describe --tags --abbrev=0)
-        else
-          echo "tag does not exist or formatting is invalid"
-          exit 1
-        fi
-        
-        echo "::set-output name=version::${RELEASE_VERSION}"
-        echo "Selected version ${RELEASE_VERSION} from
-          * ref: ${GITHUB_REF}
-          * sha: ${GITHUB_SHA}
-        "
+            echo "Verifying Release Tag"
+            if [[ $(git describe --tags --abbrev=0) =~ ^[0-9]*(.[0-9])*$ ]]; then
+              RELEASE_VERSION=$(git describe --tags --abbrev=0)
+            else
+              echo "tag does not exist or formatting is invalid"
+              exit 1
+            fi
+            
+            echo "::set-output name=version::${RELEASE_VERSION}"
+            echo "Selected version ${RELEASE_VERSION} from
+              * ref: ${GITHUB_REF}
+              * sha: ${GITHUB_SHA}
+            "
 
-    - name: Package Buildpack
-      run: |
-        #!/usr/bin/env bash
-        set -euo pipefail
+        - name: Package Buildpack
+          run: |
+            #!/usr/bin/env bash
+            set -euo pipefail
 
-        mkdir ${HOME}/build
+            mkdir ${HOME}/build
 
-        echo "Package repo using jam"
-        jam pack --buildpack "${GITHUB_WORKSPACE}/buildpack.toml" --version ${BUILDPACK_VERSION} --output "${HOME}/build/${PACKAGE_NAME}"
+            echo "Package repo using jam"
+            jam pack --buildpack "${GITHUB_WORKSPACE}/buildpack.toml" --version ${BUILDPACK_VERSION} --output "${HOME}/build/${PACKAGE_NAME}"
 
-        echo "Building docker image using packaged tgz"
-        echo "[buildpack]
-        uri = '${HOME}/build/${PACKAGE_NAME}'
-        [platform]
-        os = 'linux'" > ${HOME}/build/package.toml
-        pack package-buildpack "${BUILDPACK_NAME}:${BUILDPACK_VERSION}" --config ${HOME}/build/package.toml --format image
-      env:
-        PACKAGE_NAME: datadog-trace.tgz
-        BUILDPACK_VERSION: ${{ steps.version.outputs.version }}
+            echo "Building docker image using packaged tgz"
+            echo "[buildpack]
+            uri = '${HOME}/build/${PACKAGE_NAME}'
+            [platform]
+            os = 'linux'" > ${HOME}/build/package.toml
+            pack package-buildpack "${BUILDPACK_NAME}:${BUILDPACK_VERSION}" --config ${HOME}/build/package.toml --format image
+          env:
+            PACKAGE_NAME: datadog-trace.tgz
+            BUILDPACK_VERSION: ${{ steps.version.outputs.version }}
 
-    - name: Publish buildpack
-      run: |
-        #!/usr/bin/env bash
-        set -euo pipefail
+        - name: Publish buildpack
+          run: |
+            #!/usr/bin/env bash
+            set -euo pipefail
 
-        echo "Authenticating Github Docker"
-        echo ${GITHUB_TOKEN} | docker login https://docker.pkg.github.com -u ${{ github.actor }} --password-stdin
-        
-        echo "Publishing to Github Packages"
-
-        docker tag "${BUILDPACK_NAME}:${BUILDPACK_VERSION}" docker.pkg.github.com/datadog/${REPO_NAME}/${BUILDPACK_NAME}:${BUILDPACK_VERSION}
-        docker push docker.pkg.github.com/datadog/${REPO_NAME}/${BUILDPACK_NAME}:${BUILDPACK_VERSION}
-        
-      env:
-        BUILDPACK_VERSION: ${{ steps.version.outputs.version }}
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        REPO_NAME: ${{ github.event.repository.name }}
+            echo "Authenticating Github Docker"
+            echo ${GITHUB_TOKEN} | docker login https://docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+            
+            echo "Publishing to Github Packages"
+            docker tag "${BUILDPACK_NAME}:${BUILDPACK_VERSION}" docker.pkg.github.com/datadog/${REPO_NAME}/${BUILDPACK_NAME}:${BUILDPACK_VERSION}
+            docker push docker.pkg.github.com/datadog/${REPO_NAME}/${BUILDPACK_NAME}:${BUILDPACK_VERSION}
+            
+          env:
+            BUILDPACK_VERSION: ${{ steps.version.outputs.version }}
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            REPO_NAME: ${{ github.event.repository.name }}
 
         
 
