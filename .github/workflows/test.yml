@@ -109,6 +109,6 @@ jobs:
       env:
         BUILDPACK_VERSION: 0.1.1
         BUILDPACK_NAME: datadog-trace
-        REPO_NAME: ${{ github.repository.name }}
+        REPO_NAME: ${{ github.event.repository.name }}
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         
