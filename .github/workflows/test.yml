@@ -88,26 +88,5 @@ jobs:
         os = 'linux'" > ${HOME}/build/package.toml
         pack package-buildpack "datadog-trace:${VERSION}" --config ${HOME}/build/package.toml --format image
       env:
-        VERSION: 0.1.1
+        VERSION: 0.0.0
         PACKAGE_NAME: datadog-trace.tgz
-  
-    - name: Compute Version
-      run: |
-        #!/usr/bin/env bash
-        set -euo pipefail
-
-        echo "GITHUB REF IS ${GITHUB_REF}"
-
-        if [[ ${GITHUB_REF} =~ refs/tags/v([0-9]+\.[0-9]+\.[0-9]+) ]]; then
-          VERSION=${BASH_REMATCH[1]}
-        elif [[ ${GITHUB_REF} =~ refs/heads/(.+) ]]; then
-          VERSION=${BASH_REMATCH[1]}
-        else
-          VERSION=$(git rev-parse --short HEAD)
-        fi
-        echo "::set-output name=version::${VERSION}"
-        echo "Selected ${VERSION} from
-          * ref: ${GITHUB_REF}
-          * sha: ${GITHUB_SHA}
-        "
-        
