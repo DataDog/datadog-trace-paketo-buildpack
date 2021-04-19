@@ -8,6 +8,7 @@ on:
       publish_buildpack:
         name: Push buildpack to GitHub Packages
         runs-on: ubuntu-latest
+        steps:
         - uses: actions/checkout@v2
 
         - name: Install Go
