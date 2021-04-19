@@ -2,12 +2,12 @@ name: Publish Docker image
 on:
   release:
     types: [published]
-    env:
-      BUILDPACK_NAME: Datadog/datadog-trace-paketo-buildpack
     jobs: 
       publish_buildpack:
         name: Push buildpack to GitHub Packages
         runs-on: ubuntu-latest
+        env:
+          BUILDPACK_NAME: datadog-trace-paketo-buildpack
         steps:
         - uses: actions/checkout@v2
 
