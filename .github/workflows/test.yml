@@ -1,4 +1,4 @@
-name: Test
+name: Correctness, Build, and Formatting Tests
 
 on: [push]
 jobs:
