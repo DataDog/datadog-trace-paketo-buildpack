@@ -12,47 +12,11 @@ jobs:
       with:
         go-version: 1.15
 
-    - name: Install jam 
-      run: |
-        #!/usr/bin/env bash
-        set -euo pipefail
-
-        echo "Installing Jam ${JAM_VERSION}"
-        
-        mkdir -p "${HOME}"/bin
-
-        echo "${HOME}/bin" >> "${GITHUB_PATH}"
-        curl \
-          --location \
-          --show-error \
-          --silent \
-          "https://github.com/paketo-buildpacks/packit/releases/download/v${JAM_VERSION}/jam-linux" \
-          --output ${HOME}/bin/jam
-
-        chmod a+x "${HOME}"/bin/jam
-      env:
-        JAM_VERSION: 0.10.2
-
-
-    - name: Install pack
-      run: |
-        #!/usr/bin/env bash
-        set -euo pipefail
-
-        echo "Installing pack ${PACK_VERSION}"
-
-        mkdir -p "${HOME}"/bin
-
-        echo "${HOME}/bin" >> "${GITHUB_PATH}"
-
-        curl \
-          --location \
-          --show-error \
-          --silent \
-          "https://github.com/buildpacks/pack/releases/download/v${PACK_VERSION}/pack-v${PACK_VERSION}-linux.tgz" \
-        | tar -C "${HOME}"/bin -xz pack
+    - name: Install Dependencies
+      run: sh .github/install_dependencies.sh
       env:
         PACK_VERSION: 0.15.0
+        JAM_VERSION: 0.10.2
 
     - name: Check Format
       run: |
@@ -71,21 +35,7 @@ jobs:
       run:  go test ./...
 
     - name: Check Buildpack Packages Successfully
-      run: |
-        #!/usr/bin/env bash
-        set -euo pipefail
-
-        mkdir ${HOME}/build
-
-        echo "Package repo using jam"
-        jam pack --buildpack "${GITHUB_WORKSPACE}/buildpack.toml" --version ${VERSION} --output "${HOME}/build/${PACKAGE_NAME}"
-
-        echo "Building docker image using packaged tgz"
-        echo "[buildpack]
-        uri = '${HOME}/build/${PACKAGE_NAME}'
-        [platform]
-        os = 'linux'" > ${HOME}/build/package.toml
-        pack package-buildpack "datadog-trace:${VERSION}" --config ${HOME}/build/package.toml --format image
+      run: sh .github/create_package.sh
       env:
-        VERSION: 0.0.0
+        BUILDPACK_VERSION: 0.0.0
         PACKAGE_NAME: datadog-trace.tgz
