@@ -4,6 +4,8 @@ on: [push]
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      BUILDPACK_NAME: datadog-trace-paketo-buildpack
     steps:
     - uses: actions/checkout@v2
 
