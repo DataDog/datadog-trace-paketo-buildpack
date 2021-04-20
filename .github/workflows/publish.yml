@@ -9,6 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     env:
       BUILDPACK_NAME: datadog-trace-paketo-buildpack
+      VERSION_NUMBER: ${{github.event.release.name}}
     steps:
     - uses: actions/checkout@v2
 
@@ -21,6 +22,7 @@ jobs:
       run: |
         #!/usr/bin/env bash
         set -euo pipefail
+        echo "VERSION NUMBER IS ${VERSION_NUMBER}"
 
         echo "Installing jam ${JAM_VERSION}"
         
