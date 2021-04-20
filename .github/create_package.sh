@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
 mkdir ${HOME}/build
 
 echo "Package repo using jam"

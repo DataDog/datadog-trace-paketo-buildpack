@@ -1,6 +1,4 @@
 #!/usr/bin/env bash
-set -euo pipefail
-
 echo "Installing jam ${JAM_VERSION}"
 
 mkdir -p "${HOME}"/bin
