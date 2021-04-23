@@ -58,3 +58,9 @@ When the running the docker image using `docker run <CONTAINER_NAME>`, the conta
 
 ## Testing
 Run `go test ./...` to test run all unit tests for each of the directories.
+
+## Publishing
+The buildpack is published by creating a release. When a release is created, a Github workflow will run in the background to package and publish the repo as a Docker image under Github Packages (see [publish.yml](.github/workflows/publish.yml)).
+
+### Tagging Convention
+The naming convention for tags should be period seperated numbers (e.g. `0.1.0`, instead of `v0.1.0`). Otherwise, the packager, `jam`, will not be able to parse the tag value.

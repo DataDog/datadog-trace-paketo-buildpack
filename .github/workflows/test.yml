@@ -1,0 +1,43 @@
+name: Correctness, Build, and Formatting Tests
+
+on: [push]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    env:
+      BUILDPACK_NAME: datadog-trace-paketo-buildpack
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+
+    - name: Install Dependencies
+      run: sh .github/install_dependencies.sh
+      env:
+        PACK_VERSION: 0.15.0
+        JAM_VERSION: 0.10.2
+
+    - name: Check Format
+      run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        if [[ $(gofmt -l .) ]]; then
+          echo " The following files are not formatted properly (run `go fmt` to resolve this issue):"
+          echo "$(gofmt -l .)"
+          exit 1
+        else
+          exit 0
+        fi
+      
+    - name: Run Unit Tests
+      run:  go test ./...
+
+    - name: Check Buildpack Packages Successfully
+      run: sh .github/create_package.sh
+      env:
+        BUILDPACK_VERSION: 0.0.0
+        PACKAGE_NAME: datadog-trace.tgz

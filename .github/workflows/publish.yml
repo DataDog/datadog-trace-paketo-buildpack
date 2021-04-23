@@ -1,0 +1,46 @@
+name: Publish Docker Image
+on:
+  release:
+      types:
+          - published
+jobs: 
+  publish_buildpack:
+    name: Push buildpack to GitHub Packages
+    runs-on: ubuntu-latest
+    env:
+      BUILDPACK_NAME: datadog-trace-paketo-buildpack
+      BUILDPACK_VERSION:  ${{ github.event.release.tag_name }}
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.15
+
+    - name: Install Dependencies
+      run: sh .github/install_dependencies.sh
+      env:
+        JAM_VERSION: 0.10.2
+        PACK_VERSION: 0.15.0
+
+    - name: Package Buildpack
+      run: sh .github/create_package.sh
+      env:
+        PACKAGE_NAME: datadog-trace.tgz
+
+    - name: Publish buildpack
+      run: |
+        #!/usr/bin/env bash
+        set -euo pipefail
+
+        echo "Authenticating Github Docker"
+        echo ${GITHUB_TOKEN} | docker login https://docker.pkg.github.com -u ${{ github.actor }} --password-stdin
+        
+        echo "Publishing to Github Packages"
+        docker tag "${BUILDPACK_NAME}:${BUILDPACK_VERSION}" docker.pkg.github.com/datadog/${REPO_NAME}/${BUILDPACK_NAME}:${BUILDPACK_VERSION}
+        docker push docker.pkg.github.com/datadog/${REPO_NAME}/${BUILDPACK_NAME}:${BUILDPACK_VERSION}
+        
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        REPO_NAME: ${{ github.event.repository.name }}
