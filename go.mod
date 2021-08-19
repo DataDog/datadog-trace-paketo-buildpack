@@ -1,11 +1,10 @@
 module github.com/paketo-buildpacks/datadog-trace
 
-go 1.15
+go 1.16
 
 require (
-	github.com/buildpacks/libcnb v1.18.1
-	github.com/magiconair/properties v1.8.4
-	github.com/onsi/gomega v1.10.4
-	github.com/paketo-buildpacks/libpak v1.50.1
+	github.com/buildpacks/libcnb v1.22.0
+	github.com/onsi/gomega v1.15.0
+	github.com/paketo-buildpacks/libpak v1.51.1
 	github.com/sclevine/spec v1.4.0
 )

@@ -9,4 +9,4 @@ echo "[buildpack]
 uri = '${HOME}/build/${PACKAGE_NAME}'
 [platform]
 os = 'linux'" > ${HOME}/build/package.toml
-pack package-buildpack "${BUILDPACK_NAME}:${BUILDPACK_VERSION}" --config ${HOME}/build/package.toml --format image
+pack buildpack package "${BUILDPACK_NAME}:${BUILDPACK_VERSION}" --config ${HOME}/build/package.toml --format image

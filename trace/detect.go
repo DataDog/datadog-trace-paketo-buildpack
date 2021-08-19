@@ -20,18 +20,26 @@ import (
 	"fmt"
 
 	"github.com/buildpacks/libcnb"
+	"github.com/paketo-buildpacks/libpak"
 	"github.com/paketo-buildpacks/libpak/bindings"
 )
 
 type Detect struct{}
 
 func (d Detect) Detect(context libcnb.DetectContext) (libcnb.DetectResult, error) {
-	if _, ok, err := bindings.ResolveOne(context.Platform.Bindings, bindings.OfType("DatadogTrace")); err != nil {
-		return libcnb.DetectResult{}, fmt.Errorf("unable to resolve binding DatadogTrace\n%w", err)
-	} else if !ok {
-		return libcnb.DetectResult{Pass: false}, nil
+	cr, err := libpak.NewConfigurationResolver(context.Buildpack, nil)
+
+	if err != nil {
+		return libcnb.DetectResult{}, fmt.Errorf("unable to create configuration resolver\n%w", err)
 	}
 
+	if _, ok := cr.Resolve("BP_DATADOGTRACE_ENABLED"); !ok {
+		if _, ok, err := bindings.ResolveOne(context.Platform.Bindings, bindings.OfType("DatadogTrace")); err != nil {
+			return libcnb.DetectResult{}, fmt.Errorf("unable to resolve binding DatadogTrace\n%w", err)
+		} else if !ok {
+			return libcnb.DetectResult{Pass: false}, nil
+		}
+	}
 	return libcnb.DetectResult{
 		Pass: true,
 		Plans: []libcnb.BuildPlan{

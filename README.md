@@ -5,7 +5,7 @@ The Paketo Datadog Trace Buildpack is a Cloud Native Buildpack that contributes 
 ## Behaviour
 This buildpack will participate if all the following conditions are met:
 
-* A [binding](https://paketo.io/docs/buildpacks/configuration/#bindings) exists with `type` of `DatadogTrace`
+* A [binding](https://paketo.io/docs/buildpacks/configuration/#bindings) exists with `type` of `DatadogTrace` or `BP_DATADOGTRACE_ENABLED` is set
 
 The buildpack will do the following for Java applications:
 

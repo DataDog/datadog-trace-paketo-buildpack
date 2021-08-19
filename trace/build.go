@@ -55,10 +55,11 @@ func (b Build) Build(context libcnb.BuildContext) (libcnb.BuildResult, error) {
 		}
 
 		b.Logger.Info("creating new Datadog java agent")
-		ja := NewJavaAgent(context.Buildpack.Path, dep, dc, result.Plan, context)
 
+		ja, be := NewJavaAgent(dep, dc, context)
 		ja.Logger = b.Logger
 		result.Layers = append(result.Layers, ja)
+		result.BOM.Entries = append(result.BOM.Entries, be)
 	}
 
 	return result, nil
