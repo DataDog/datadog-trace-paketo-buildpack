@@ -59,7 +59,10 @@ func testJavaAgent(t *testing.T, context spec.G, it spec.S) {
 
 	it("contributes Java agent as a part of the build pack", func() {
 
-		j := trace.NewJavaAgent(ctx.Buildpack.Path, dep, dc, &libcnb.BuildpackPlan{}, ctx)
+		j, be := trace.NewJavaAgent(dep, dc, ctx)
+		Expect(be.Launch).To(BeTrue())
+		Expect(be.Metadata["uri"]).To(Equal("https://localhost/dd-java-agent.jar"))
+
 		layer, err := ctx.Layers.Layer("test-layer")
 		Expect(err).NotTo(HaveOccurred())
 
@@ -85,7 +88,10 @@ func testJavaAgent(t *testing.T, context spec.G, it spec.S) {
 			binding,
 		}
 
-		j := trace.NewJavaAgent(ctx.Buildpack.Path, dep, dc, &libcnb.BuildpackPlan{}, ctx)
+		j, be := trace.NewJavaAgent(dep, dc, ctx)
+		Expect(be.Launch).To(BeTrue())
+		Expect(be.Metadata["uri"]).To(Equal("https://localhost/dd-java-agent.jar"))
+
 		layer, err := ctx.Layers.Layer("test-layer")
 
 		layer, err = j.Contribute(layer)

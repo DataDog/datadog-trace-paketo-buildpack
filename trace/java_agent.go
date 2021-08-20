@@ -30,7 +30,6 @@ import (
 )
 
 type JavaAgent struct {
-	BuildpackPath    string
 	Context          libcnb.BuildContext
 	LayerContributor libpak.DependencyLayerContributor
 	Logger           bard.Logger
@@ -44,21 +43,20 @@ const (
 	agentConfigEnv = "DD_TRACE_CONFIG"
 )
 
-func NewJavaAgent(buildpackPath string, dependency libpak.BuildpackDependency, cache libpak.DependencyCache,
-	plan *libcnb.BuildpackPlan, context libcnb.BuildContext) JavaAgent {
-
+func NewJavaAgent(dependency libpak.BuildpackDependency, cache libpak.DependencyCache, context libcnb.BuildContext) (JavaAgent, libcnb.BOMEntry) {
+	contributor, entry := libpak.NewDependencyLayer(dependency, cache, libcnb.LayerTypes{
+		Launch: true,
+	})
 	return JavaAgent{
 		Context:          context,
-		BuildpackPath:    buildpackPath,
-		LayerContributor: libpak.NewDependencyLayerContributor(dependency, cache, plan),
-	}
+		LayerContributor: contributor}, entry
 }
 
 func (j JavaAgent) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 	j.LayerContributor.Logger = j.Logger
 
 	return j.LayerContributor.Contribute(layer, func(artifact *os.File) (libcnb.Layer, error) {
-		j.Logger.Bodyf("Copying to agent to %s", layer.Path)
+		j.Logger.Bodyf("Copying agent to %s", layer.Path)
 
 		//get the java agent and copy it into the image
 		file := filepath.Join(layer.Path, filepath.Base(artifact.Name()))
@@ -67,7 +65,6 @@ func (j JavaAgent) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 		}
 
 		binding, ok, _ := bindings.ResolveOne(j.Context.Platform.Bindings, bindings.OfType("DatadogTrace"))
-
 		//handle the bindings of `DatadogTrace` which agent configurations
 		if ok {
 			err := handleAgentProperties(binding, layer, j.Logger)
@@ -79,7 +76,7 @@ func (j JavaAgent) Contribute(layer libcnb.Layer) (libcnb.Layer, error) {
 		layer.LaunchEnvironment.Appendf(javaToolEnv, " ", "-javaagent:"+file)
 
 		return layer, nil
-	}, libpak.LaunchLayer)
+	})
 }
 
 func (j JavaAgent) Name() string {

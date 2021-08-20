@@ -17,6 +17,7 @@
 package trace_test
 
 import (
+	"os"
 	"testing"
 
 	"github.com/buildpacks/libcnb"
@@ -33,7 +34,7 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 		detect trace.Detect
 	)
 
-	it("fails without service", func() {
+	it("fails without service and variable", func() {
 		Expect(detect.Detect(ctx)).To(Equal(libcnb.DetectResult{}))
 	})
 
@@ -56,5 +57,32 @@ func testDetect(t *testing.T, context spec.G, it spec.S) {
 				},
 			},
 		}))
+	})
+
+	context("$BP_DATADOGTRACE_ENABLED", func() {
+		it.Before(func() {
+			Expect(os.Setenv("BP_DATADOGTRACE_ENABLED", "true")).To(Succeed())
+		})
+
+		it.After(func() {
+			Expect(os.Unsetenv("BP_DATADOGTRACE_ENABLED")).To(Succeed())
+		})
+
+		it("passes with BP_DATADOGTRACE_ENABLED", func() {
+			Expect(detect.Detect(ctx)).To(Equal(libcnb.DetectResult{
+				Pass: true,
+				Plans: []libcnb.BuildPlan{
+					{
+						Provides: []libcnb.BuildPlanProvide{
+							{Name: "datadog-trace-java"},
+						},
+						Requires: []libcnb.BuildPlanRequire{
+							{Name: "datadog-trace-java"},
+							{Name: "jvm-application"},
+						},
+					},
+				},
+			}))
+		})
 	})
 }
