@@ -28,7 +28,7 @@ esac
 rm -rf build &> /dev/null
 mkdir build
 
-wget -O "./build/${packageBinName}" "https://github.com/paketo-buildpacks/packit/releases/latest/download/${packageBinName}"
+wget -O "./build/${packageBinName}" "https://github.com/paketo-buildpacks/jam/releases/latest/download/${packageBinName}"
 chmod a+x "./build/${packageBinName}"
 
 ./build/jam-darwin pack --buildpack ./buildpack.toml --version ${version} --output "./build/${packageName}"
